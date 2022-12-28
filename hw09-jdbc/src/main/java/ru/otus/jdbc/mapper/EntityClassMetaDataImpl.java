@@ -30,17 +30,17 @@ public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
     }
 
     @Override
-    public Constructor getConstructor() {
+    public Constructor<T> getConstructor() throws NoSuchMethodException {
         try {
-            return clazz.getConstructor();
-        } catch (NoSuchMethodException e) {
-            return null;
+            return (Constructor<T>) clazz.getConstructor();
+        } catch (Exception e) {
+            throw new NoSuchMethodException();
         }
     }
 
     @Override
     public Field getIdField() {
-        return fieldsFilterByID.get(true).stream().findFirst().get();
+        return fieldsFilterByID.get(true).get(0);
     }
 
     @Override

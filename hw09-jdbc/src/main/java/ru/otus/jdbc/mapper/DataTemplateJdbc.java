@@ -63,8 +63,8 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 try {
                     field.setAccessible(true);
                     field.set(obj, rs.getObject(field.getName()));
-                } catch (IllegalAccessException | SQLException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    throw new IllegalStateException("Object creation error");
                 }
             });
             return obj;
