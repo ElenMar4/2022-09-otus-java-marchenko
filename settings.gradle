@@ -1,3 +1,4 @@
 rootProject.name = '2022-09-java'
 include 'hw09-jdbc'
+include 'hw10-jpql'
 
