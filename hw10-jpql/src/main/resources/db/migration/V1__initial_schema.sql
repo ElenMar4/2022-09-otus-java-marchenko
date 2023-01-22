@@ -14,16 +14,14 @@ create sequence hibernate_sequence start with 1 increment by 1;
 create table clients
 (
     id   bigint not null primary key,
-    name varchar(50)
+    name varchar(50),
+    address_id bigint
 );
 create table address
 (
     id   bigserial not null primary key,
-    street varchar(250),
-    client_id bigint
+    street varchar(250)
 );
-alter table clients add column address_id bigint
-CONSTRAINT fk_address_id REFERENCES address(id);
 
 create table phones
 (

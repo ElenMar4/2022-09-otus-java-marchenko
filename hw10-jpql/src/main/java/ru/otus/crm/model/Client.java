@@ -1,6 +1,7 @@
 package ru.otus.crm.model;
 
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -24,11 +26,11 @@ public class Client implements Cloneable {
     @Column(name = "name")
     private String name;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch=FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy="client", fetch=FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="client", fetch=FetchType.LAZY)
     private List<Phone> phones = new ArrayList<>();
 
     public Client(String name) {
@@ -45,32 +47,17 @@ public class Client implements Cloneable {
         this.id = id;
         this.name = name;
         this.address = address;
-        this.phones.addAll(phones);
-
-        if (address != null) {
-            address.setClient(this);
-        }
-
-        phones.forEach(p -> p.setClient(this));
+        phones.forEach(v -> v.setClient(this));
+        this.phones = phones;
     }
-
 
     @Override
     public Client clone() {
-
         return new Client(
                 this.id,
                 this.name,
-                this.address != null ? this.address.clone() : null,
-                phones != null ? List.copyOf(this.phones) : null);
-    }
-
-    public void setPhone(Phone phone) {
-        this.phones.add(phone);
-    }
-
-    public void removePhone(Phone phone) {
-        this.phones.remove(phone);
+                this.address.clone(),
+                this.phones.stream().map(Phone::clone).collect(Collectors.toList()));
     }
 
     @Override
@@ -79,7 +66,7 @@ public class Client implements Cloneable {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", address=" + address +
-                ", phones=" + phones +
+                ", phones=" + phones.toString() +
                 '}';
     }
 }
