@@ -3,3 +3,4 @@
 
 # Домашние задания:
 hw09-jdbc       -   самодельный ORM
+hw10-jpql(hibernate)    -   использование Hibernate
