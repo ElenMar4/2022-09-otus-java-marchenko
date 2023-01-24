@@ -39,6 +39,7 @@ out
 *.idea
 .idea/
 .out/
+.tmp/
 
 
 
