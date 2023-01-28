@@ -11,4 +11,6 @@ public interface Cache<K, V> {
     void addListener(Listener<K, V> listener);
 
     void removeListener(Listener<K, V> listener);
+
+    boolean checkPresenceIdInCache (K key);
 }

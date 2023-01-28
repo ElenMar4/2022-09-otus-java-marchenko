@@ -11,6 +11,10 @@ import ru.otus.crm.model.Address;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.model.Phone;
 import ru.otus.crm.service.DbServiceClientImpl;
+import ru.otus.crm.service.DbServiceClientImplWithCache;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbService {
 
@@ -31,24 +35,37 @@ public class DbService {
         var sessionFactory = HibernateUtils.buildSessionFactory(configuration, Client.class, Address.class, Phone.class);
 
         var transactionManager = new TransactionManagerHibernate(sessionFactory);
-///
+
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
-///
-        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
-        dbServiceClient.saveClient(new Client("dbServiceFirst"));
 
-        var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
-        var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())
-                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecond.getId()));
-        log.info("clientSecondSelected:{}", clientSecondSelected);
-///
-        dbServiceClient.saveClient(new Client(clientSecondSelected.getId(), "dbServiceSecondUpdated"));
-        var clientUpdated = dbServiceClient.getClient(clientSecondSelected.getId())
-                .orElseThrow(() -> new RuntimeException("Client not found, id:" + clientSecondSelected.getId()));
-        log.info("clientUpdated:{}", clientUpdated);
+        //Меняя имплементацию dbServiceClient, получаем разное время выполнения
 
-        log.info("All clients");
-        dbServiceClient.findAll().forEach(client -> log.info("client:{}", client));
+//        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
+        var dbServiceClient = new DbServiceClientImplWithCache(transactionManager, clientTemplate);
+
+
+        List<Client> listClients = new ArrayList<>();
+        for(int i = 0; i < 100; i++){
+            String tempNameClient = "Client" + i;
+            String tempAddress = "street" + i;
+            String tempPhoneOne = i + "-" + i +"-" + i;
+            String tempPhoneTwo = i + "-" + i +"-" + i+ "-" + i;
+            listClients.add(dbServiceClient.saveClient(new Client(null,
+                                                    tempNameClient,
+                                                    new Address(null, tempAddress),
+                                                    List.of(new Phone(null, tempPhoneOne), new Phone(null, tempPhoneTwo)))));
+        }
+
+        long start = System.currentTimeMillis();
+        for (Client client : listClients) {
+            dbServiceClient.getClient(client.getId())
+                    .orElseThrow(() -> new RuntimeException("Client not found, id:" + client.getId()));
+        }
+        long finish = System.currentTimeMillis();
+
+        System.out.println("_____ Время поиска клиентов: " + (finish - start) + " _______");
+
+        System.gc();
     }
 }
 
