@@ -40,12 +40,12 @@ public class DbService {
 
         //Меняя имплементацию dbServiceClient, получаем разное время выполнения
 
-//        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
-        var dbServiceClient = new DbServiceClientImplWithCache(transactionManager, clientTemplate);
+        var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
+//        var dbServiceClient = new DbServiceClientImplWithCache(transactionManager, clientTemplate);
 
 
         List<Client> listClients = new ArrayList<>();
-        for(int i = 0; i < 100; i++){
+        for(int i = 0; i < 300; i++){
             String tempNameClient = "Client" + i;
             String tempAddress = "street" + i;
             String tempPhoneOne = i + "-" + i +"-" + i;

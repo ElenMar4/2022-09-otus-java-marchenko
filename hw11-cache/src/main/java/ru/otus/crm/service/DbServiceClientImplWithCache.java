@@ -31,12 +31,13 @@ public class DbServiceClientImplWithCache implements DBServiceClient {
                 clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 cache.put(clientCloned.getId(), clientCloned);
+                log.info("Client add in cache");
                 return clientCloned;
             }
-            cache.remove(clientCloned.getId());
             clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", clientCloned);
             cache.put(clientCloned.getId(), clientCloned);
+            log.info("Client add in cache");
             return clientCloned;
         });
     }
@@ -44,13 +45,17 @@ public class DbServiceClientImplWithCache implements DBServiceClient {
     @Override
     public Optional<Client> getClient(long id) {
         if (cache != null && cache.checkPresenceIdInCache(id)) {
+            log.info("Client with id=" + id + " find in cache");
             return Optional.ofNullable(cache.get(id));
+        } else {
+            log.info("Client with id=" + id + " not found in cache.");
+            return transactionManager.doInReadOnlyTransaction(session -> {
+                var clientOptional = clientDataTemplate.findById(session, id);
+                clientOptional.ifPresent(client -> cache.put(client.getId(), client.clone()));
+                log.info("client: {}", clientOptional);
+                return clientOptional;
+            });
         }
-        return transactionManager.doInReadOnlyTransaction(session -> {
-            var clientOptional = clientDataTemplate.findById(session, id);
-            log.info("client: {}", clientOptional);
-            return clientOptional;
-        });
     }
 
     @Override
@@ -58,6 +63,7 @@ public class DbServiceClientImplWithCache implements DBServiceClient {
         return transactionManager.doInReadOnlyTransaction(session -> {
             var clientList = clientDataTemplate.findAll(session);
             log.info("clientList:{}", clientList);
+            clientList.forEach(client -> cache.put(client.getId(), client.clone()));
             return clientList;
         });
     }
