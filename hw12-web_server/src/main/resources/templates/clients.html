@@ -1,0 +1,48 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml" content="text/html;">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Клиенты</title>
+
+    <script>
+
+    </script>
+</head>
+
+<form name="saveNewClient" method="post" action="clients">
+    <h4>Создать нового клиента</h4>
+    <p><input type="text" size="40" id = "newClientName" name="newClientName" placeholder="Введите имя клиента"></p>
+    <p><input type="text" size="40" id = "newClientAddress" name="newClientAddress" placeholder="Введите адрес клиента"></p>
+    <p><input type="text" size="40" id = "newClientPhones" name="newClientPhones" placeholder="Введите телефон клиента"></p>
+    <button onclick="saveNewClient()">Сохранить</button>
+</form>
+
+<div id="container">
+    <h4>Список клиентов</h4>
+    <table border="1" width="100%" cellpadding="5" style="width: 600px" class="table">
+        <thead>
+        <tr>
+            <th style="width: 50px">ID</th>
+            <th style="width: 100px">Имя</th>
+            <th style="width: 100px">Адресс</th>
+            <th style="width: 100px">Номер телефона</th>
+        </tr>
+        </thead>
+        <tbody>
+        <#list clients as client>
+        <tr>
+            <td align="center">${client.id}</td>
+            <td align="center">${client.name}</td>
+            <td align="center">${client.address.street}</td>
+            <td align="center">
+                <#list client.phones as phone>
+                ${phone.number}
+            </#list>
+            </td>
+        </tr>
+        </#list>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
