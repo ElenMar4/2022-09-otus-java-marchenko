@@ -3,4 +3,6 @@
 
 # Домашние задания:
 hw09-jdbc       -   самодельный ORM
-hw10-jpql(hibernate)    -   использование Hibernate
+hw10-jpql       -   использование Hibernate
+hw11-cache      -   свой cache engine на базе hw10-jpql
+hw12-web_server -   веб сервер на базе hw10-jpql
