@@ -10,10 +10,14 @@
 </head>
 
 <form name="saveNewClient" method="post" action="clients">
-    <h4>Создать нового клиента</h4>
-    <p><input type="text" size="40" id = "newClientName" name="newClientName" placeholder="Введите имя клиента"></p>
-    <p><input type="text" size="40" id = "newClientAddress" name="newClientAddress" placeholder="Введите адрес клиента"></p>
-    <p><input type="text" size="40" id = "newClientPhones" name="newClientPhones" placeholder="Введите телефон клиента"></p>
+    <div id="profileClient">
+        <h4>Создать нового клиента</h4>
+        <p><input type="text" size="40" id = "newClientName" name="newClientName" placeholder="Введите имя клиента" required></p>
+        <p><input type="text" size="40" id = "newClientAddress" name="newClientAddress" placeholder="Введите адрес клиента" required></p>
+        <p><input type="text" size="40" id = "newClientPhone" name="NewClientPhone" pattern="7-[0-9]{3}-[0-9]{3}" placeholder="Введите телефон 7-xxx-xxx" required></p>
+        <p><input type="text" size="40" id = "newClientPhoneTwo" name="NewClientPhone" pattern="7-[0-9]{3}-[0-9]{3}" placeholder="Введите телефон 7-xxx-xxx(необязательно)"></p>
+        <p><input type="text" size="40" id = "newClientPhoneThree" name="NewClientPhone" pattern="7-[0-9]{3}-[0-9]{3}" placeholder="Введите телефон 7-xxx-xxx(необязательно)"></p>
+    </div>
     <button onclick="saveNewClient()">Сохранить</button>
 </form>
 
@@ -34,9 +38,9 @@
             <td align="center">${client.id}</td>
             <td align="center">${client.name}</td>
             <td align="center">${client.address.street}</td>
-            <td align="center">
+            <td align="left">
                 <#list client.phones as phone>
-                ${phone.number}
+                <ul>${phone.number}</ul>
             </#list>
             </td>
         </tr>

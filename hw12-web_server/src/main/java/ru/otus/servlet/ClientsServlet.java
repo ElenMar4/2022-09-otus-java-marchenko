@@ -12,11 +12,7 @@ import ru.otus.data.crm.service.DBServiceClient;
 import ru.otus.services.TemplateProcessor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class ClientsServlet extends HttpServlet {
@@ -25,7 +21,7 @@ public class ClientsServlet extends HttpServlet {
     private static final String TEMPLATE_ATTR_ALL_CLIENTS = "clients";
     private static final String NEW_CLIENT_NAME = "newClientName";
     private static final String NEW_CLIENT_ADDRESS = "newClientAddress";
-    private static final String NEW_CLIENT_PHONES = "newClientPhones";
+    private static final String NEW_CLIENT_PHONES = "NewClientPhone";
 
 
     private final DBServiceClient dbServiceClient;
@@ -45,7 +41,12 @@ public class ClientsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         List<Phone> phones = new ArrayList<>();
-        phones.add(new Phone(req.getParameter(NEW_CLIENT_PHONES)));
+        String[] strPhones = req.getParameterValues(NEW_CLIENT_PHONES);
+        if (strPhones!=null) {
+            for (String strNumber : strPhones) {
+                phones.add(new Phone(strNumber));
+            }
+        }
         dbServiceClient.saveClient(new Client(req.getParameter(NEW_CLIENT_NAME),
                 new Address(req.getParameter(NEW_CLIENT_ADDRESS)),
                 phones));
