@@ -6,7 +6,7 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 dependencies {
-    implementation("org.reflections:reflections:${Versions.reflections}")
+//    implementation("org.reflections:reflections:${Versions.reflections}")
 
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
