@@ -5,6 +5,7 @@ import ru.otus.appcontainer.api.AppComponent;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
 import ru.otus.appcontainer.exception.ComponentDuplicationException;
+import ru.otus.appcontainer.exception.MissingComponentException;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -57,18 +58,18 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
             }
             Object resultSet = method.invoke(componentConfig, args);
             if(appComponentsByName.containsKey(nameBean)){
-                throw new ComponentDuplicationException();
+                throw new ComponentDuplicationException("Trying to extract a duplicate component");
             } else {
                 appComponentsByName.put(nameBean, resultSet);
                 appComponents.add(resultSet);
             }
         } catch (Exception ex) {
-            throw new RuntimeException();
+            throw new IllegalArgumentException();
         }
     }
 
     @Override
-    public <C> C getAppComponent(Class<C> componentClass) {
+    public <C> C getAppComponent(Class<C> componentClass) throws MissingComponentException, ComponentDuplicationException {
 
         List<Object> resultComponent = new ArrayList<>() ;
         for(Object component : appComponents){
@@ -80,17 +81,19 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
             return (C) resultComponent.get(0);
         } else {
             if (resultComponent.isEmpty()){
-                throw new RuntimeException(String.format("Component %s not found", componentClass.getComponentType()));
+                throw new MissingComponentException(String.format("Component %s not found", componentClass.getComponentType()));
             } else {
-                throw new ComponentDuplicationException();
+                throw new ComponentDuplicationException(String.format("Many components found: %s", resultComponent.size()));
             }
         }
     }
 
     @Override
-    public <C> C getAppComponent(String componentName) {
+    public <C> C getAppComponent(String componentName) throws MissingComponentException {
         if (appComponentsByName.containsKey(componentName)) {
             return (C) appComponentsByName.get(componentName);
-        } else throw new IllegalArgumentException();
+        } else {
+            throw new MissingComponentException("Component isn't found");
+        }
     }
 }
