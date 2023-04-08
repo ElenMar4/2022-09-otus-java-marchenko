@@ -1,0 +1,49 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"  xmlns:th="http://www.thymeleaf.org" content="text/html;">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Клиенты</title>
+
+    <script>
+
+    </script>
+</head>
+
+<form name="saveNewClient" method="post" action = "/clients/add">
+    <div id="profileClient">
+        <h4>Создать нового клиента</h4>
+        <p><input type="text" size="40" id = "name" name="name" placeholder="Введите имя клиента" required></p>
+        <p><input type="text" size="40" id = "address" name="address" placeholder="Введите адрес клиента" required></p>
+        <p><input type="text" size="40" id = "phone1" name="phone1" pattern="[0-9]{4}" placeholder="Введите телефон xxxx" required></p>
+        <p><input type="text" size="40" id = "phone2" name="phone2" pattern="[0-9]{4}" placeholder="Введите телефон xxxx(необязательно)"></p>
+        <p><input type="text" size="40" id = "phone3" name="phone3" pattern="[0-9]{4}" placeholder="Введите телефон xxxx(необязательно)"></p>
+    </div>
+    <button onclick="saveNewClient()">Сохранить</button>
+</form>
+
+<form name="allClients" method="get" action="clients">
+<div id="container" >
+    <h4>Список клиентов</h4>
+    <table border="1" width="100%" cellpadding="5" style="width: 600px" class="table" >
+        <thead>
+        <tr>
+            <th style="width: 50px">ID</th>
+            <th style="width: 100px">Имя</th>
+            <th style="width: 100px">Адресс</th>
+            <th style="width: 100px">Номер телефона</th>
+        </tr>
+        </thead>
+        <tbody>
+                <tr th:each="client : ${clients}">
+                    <td align="center"th:text="${client.id}"></td>
+                    <td align="center"th:text="${client.name}"></td>
+                    <td align="center"th:text="${client.address.street}"></td>
+                    <td align="left" th:text="${#strings.arrayJoin(client.phones.![number], ',')}"></td>
+
+                </tr>
+        </tbody>
+    </table>
+</div>
+</form>
+</body>
+</html>

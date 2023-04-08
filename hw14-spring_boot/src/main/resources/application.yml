@@ -1,0 +1,21 @@
+
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5430/demoDB
+    username: usr
+    password: pwd
+  flyway:
+    enabled: true
+logging:
+  level:
+    sql: debug
+
+flyway:
+  enabled: true
+  user: usr
+  password: pwd
+  url: jdbc:postgresql://localhost:5432/demoDB
