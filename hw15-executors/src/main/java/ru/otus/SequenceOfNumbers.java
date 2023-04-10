@@ -8,7 +8,7 @@ public class SequenceOfNumbers {
     private boolean isRevers = false;
     private int lastThread = 2;
 
-    private synchronized void action(int numberThread) {
+    public synchronized void action(int numberThread) {
         int lastNumber = 0;
         while (!Thread.currentThread().isInterrupted()) {
             try {
@@ -47,9 +47,5 @@ public class SequenceOfNumbers {
         return isRevers ? last - inc : last + inc;
     }
 
-    public static void main(String[] args) {
-        SequenceOfNumbers app = new SequenceOfNumbers();
-        new Thread(() -> app.action(1)).start();
-        new Thread(() -> app.action(2)).start();
-    }
+
 }
