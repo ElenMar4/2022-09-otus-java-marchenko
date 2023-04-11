@@ -6,32 +6,55 @@ import ru.otus.lib.SensorDataBufferedWriter;
 import ru.otus.api.SensorDataProcessor;
 import ru.otus.api.model.SensorData;
 
-// Этот класс нужно реализовать
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private static final Logger log = LoggerFactory.getLogger(SensorDataProcessorBuffered.class);
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
+    private final BlockingQueue<SensorData> bufferData;
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
+        this.bufferData = new PriorityBlockingQueue<>(bufferSize, Comparator.comparing(SensorData::getMeasurementTime));
     }
 
     @Override
-    public void process(SensorData data) {
-    /*
-        if (dataBuffer.size() >= bufferSize) {
-            flush();
+    public synchronized void process(SensorData data) {
+        try {
+            bufferData.put(data);
+            if (bufferData.size() >= bufferSize) {
+                flush();
+            }
+        } catch (InterruptedException e) {
+            log.error("Ошибка в процессе записи в буфер", e);
         }
-    */
     }
 
-    public void flush() {
+    public synchronized void flush() {
         try {
-            //writer.writeBufferedData(bufferedData);
+            if (bufferData.isEmpty()) {
+                return;
+            } else {
+                List<SensorData> bufferedData = new ArrayList<>();
+                for (int i = 0; i < bufferSize; i++) {
+                    var data = bufferData.poll();
+                    if (data == null) {
+                        break;
+                    } else {
+                        bufferedData.add(data);
+                    }
+                }
+                writer.writeBufferedData(bufferedData);
+            }
         } catch (Exception e) {
-            log.error("Ошибка в процессе записи буфера", e);
+            log.error("Ошибка в процессе записи буфера на носитель", e);
         }
     }
 
