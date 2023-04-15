@@ -14,7 +14,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public class SensorDataProcessorBuffered implements SensorDataProcessor {
     private static final Logger log = LoggerFactory.getLogger(SensorDataProcessorBuffered.class);
-
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
     private final BlockingQueue<SensorData> bufferData;
@@ -34,6 +33,7 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
             }
         } catch (InterruptedException e) {
             log.error("Ошибка в процессе записи в буфер", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -42,16 +42,9 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
             if (bufferData.isEmpty()) {
                 return;
             } else {
-                List<SensorData> bufferedData = new ArrayList<>();
-                for (int i = 0; i < bufferSize; i++) {
-                    var data = bufferData.poll();
-                    if (data == null) {
-                        break;
-                    } else {
-                        bufferedData.add(data);
-                    }
-                }
-                writer.writeBufferedData(bufferedData);
+                List<SensorData> recordingData = new ArrayList<>();
+                bufferData.drainTo(recordingData);
+                writer.writeBufferedData(recordingData);
             }
         } catch (Exception e) {
             log.error("Ошибка в процессе записи буфера на носитель", e);
