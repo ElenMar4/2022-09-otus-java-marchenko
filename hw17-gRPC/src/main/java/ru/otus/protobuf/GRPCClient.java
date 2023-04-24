@@ -6,22 +6,22 @@ import ru.otus.protobuf.generated.ClientRequest;
 import ru.otus.protobuf.generated.RemoteDBServiceGrpc;
 import ru.otus.protobuf.generated.ServerResponse;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GRPCClient {
 
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8080;
-    private static final Deque<Integer> responseQueue = new ArrayDeque<>();
+    private static final AtomicInteger responseNumber = new AtomicInteger(0);
     private static final int REQUEST_FIRST_NUMBER = 0;
     private static final int REQUEST_LAST_NUMBER = 20;
     private static final int NUMBER_OF_ITERATIONS = 50;
+
+
     public static void main(String[] args) {
 
-        var channel = ManagedChannelBuilder.forAddress(SERVER_HOST,SERVER_PORT)
+        var channel = ManagedChannelBuilder.forAddress(SERVER_HOST, SERVER_PORT)
                 .usePlaintext()
                 .build();
 
@@ -33,16 +33,20 @@ public class GRPCClient {
                 .setLastNumber(REQUEST_LAST_NUMBER)
                 .build();
 
-        var responseObserver = new StreamObserver<ServerResponse>(){
 
-            public Integer getNumberFromServer (){
-                return Optional.ofNullable(responseQueue.poll()).orElse(0);
+        var responseObserver = new StreamObserver<ServerResponse>() {
+            int currentNumber = 0;
+
+            public Integer getNumberFromServer() {
+                var response = currentNumber == responseNumber.get() ? 0 : responseNumber.get();
+                currentNumber = responseNumber.get();
+                return response;
             }
 
             @Override
             public void onNext(ServerResponse value) {
-                responseQueue.add(value.getNextNumbers());
-                System.out.printf("          Сервер---> valueFromServer: %d %n", value.getNextNumbers());
+                responseNumber.set(value.getNextNumbers());
+                System.out.printf("          Сервер---> valueFromServer: %d %n", responseNumber.get());
             }
 
             @Override
@@ -65,7 +69,7 @@ public class GRPCClient {
             System.out.printf("%d) Клиент---> currentValue: %d%n", i, currentValue);
             try {
                 Thread.sleep(1000);
-            }catch (InterruptedException ex){
+            } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
         }
