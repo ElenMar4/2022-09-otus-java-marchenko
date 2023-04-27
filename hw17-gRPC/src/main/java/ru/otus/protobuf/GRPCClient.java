@@ -35,12 +35,9 @@ public class GRPCClient {
 
 
         var responseObserver = new StreamObserver<ServerResponse>() {
-            int currentNumber = 0;
 
-            public Integer getNumberFromServer() {
-                var response = currentNumber == responseNumber.get() ? 0 : responseNumber.get();
-                currentNumber = responseNumber.get();
-                return response;
+            public int getNumberFromServer() {
+                return responseNumber.getAndSet(0);
             }
 
             @Override
