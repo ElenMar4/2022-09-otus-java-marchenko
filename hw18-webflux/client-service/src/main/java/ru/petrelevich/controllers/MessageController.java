@@ -37,7 +37,7 @@ public class MessageController {
     public void getMessage(@DestinationVariable String roomId, Message message) {
         logger.info("get message:{}, roomId:{}", message, roomId);
 
-        if (roomId.equals(SPY_ROOM)){
+        if (roomId.equals(SPY_ROOM)) {
             logger.info("Oops! The spy cannot send messages. You gave yourself away!");
         } else {
             saveMessage(roomId, message)
@@ -62,11 +62,11 @@ public class MessageController {
         }
         var roomId = parseRoomId(simpDestination);
 
-        if (Long.toString(roomId).equals(SPY_ROOM)){
+        if (Long.toString(roomId).equals(SPY_ROOM)) {
             getAllMessages()
                     .doOnError(ex -> logger.error("getting messages for roomId:{} failed", roomId, ex))
                     .subscribe(message -> template.convertAndSend(simpDestination, message));
-        }else {
+        } else {
             getMessagesByRoomId(roomId)
                     .doOnError(ex -> logger.error("getting messages for roomId:{} failed", roomId, ex))
                     .subscribe(message -> template.convertAndSend(simpDestination, message));
